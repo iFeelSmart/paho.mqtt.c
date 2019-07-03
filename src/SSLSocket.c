@@ -207,6 +207,7 @@ char* SSL_get_verify_result_string(int rc)
 
 void SSL_CTX_info_callback(const SSL* ssl, int where, int ret)
 {
+#ifndef ANDROID
 	if (where & SSL_CB_LOOP)
 	{
 		Log(TRACE_PROTOCOL, 1, "SSL state %s:%s:%s",
@@ -244,6 +245,7 @@ void SSL_CTX_info_callback(const SSL* ssl, int where, int ret)
 		Log(TRACE_PROTOCOL, 1, "SSL state %s:%s:%s", SSL_state_string_long(ssl),
                    SSL_alert_type_string_long(ret), SSL_alert_desc_string_long(ret));
 	}
+#endif
 }
 
 
