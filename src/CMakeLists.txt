@@ -151,23 +151,27 @@ IF (PAHO_WITH_SSL)
 
     ## common compilation for libpaho-mqtt3cs and libpaho-mqtt3as
     ## Note: SSL libraries must be recompiled due ifdefs
+
     ADD_LIBRARY(common_ssl_obj OBJECT ${common_src})
     SET_PROPERTY(TARGET common_ssl_obj PROPERTY POSITION_INDEPENDENT_CODE ON)
     SET_PROPERTY(TARGET common_ssl_obj PROPERTY COMPILE_DEFINITIONS "OPENSSL=1")
-    ADD_LIBRARY(paho-mqtt3cs SHARED $<TARGET_OBJECTS:common_ssl_obj> MQTTClient.c SSLSocket.c)
-    ADD_LIBRARY(paho-mqtt3as SHARED $<TARGET_OBJECTS:common_ssl_obj> MQTTAsync.c SSLSocket.c)
+    
+    IF (PAHO_BUILD_SHARED)
+        ADD_LIBRARY(paho-mqtt3cs SHARED $<TARGET_OBJECTS:common_ssl_obj> MQTTClient.c SSLSocket.c)
+        ADD_LIBRARY(paho-mqtt3as SHARED $<TARGET_OBJECTS:common_ssl_obj> MQTTAsync.c SSLSocket.c)
 
-    TARGET_LINK_LIBRARIES(paho-mqtt3cs ${OPENSSL_LIB} ${OPENSSLCRYPTO_LIB} ${LIBS_SYSTEM})
-    TARGET_LINK_LIBRARIES(paho-mqtt3as ${OPENSSL_LIB} ${OPENSSLCRYPTO_LIB} ${LIBS_SYSTEM})
-    SET_TARGET_PROPERTIES(
-        paho-mqtt3cs paho-mqtt3as PROPERTIES
-        VERSION ${CLIENT_VERSION}
-        SOVERSION ${PAHO_VERSION_MAJOR}
-        COMPILE_DEFINITIONS "OPENSSL=1")
-    INSTALL(TARGETS paho-mqtt3cs paho-mqtt3as
-        ARCHIVE DESTINATION  ${CMAKE_INSTALL_LIBDIR}
-        LIBRARY DESTINATION  ${CMAKE_INSTALL_LIBDIR}
-        RUNTIME DESTINATION  ${CMAKE_INSTALL_BINDIR})
+        TARGET_LINK_LIBRARIES(paho-mqtt3cs ${OPENSSL_LIB} ${OPENSSLCRYPTO_LIB} ${LIBS_SYSTEM})
+        TARGET_LINK_LIBRARIES(paho-mqtt3as ${OPENSSL_LIB} ${OPENSSLCRYPTO_LIB} ${LIBS_SYSTEM})
+        SET_TARGET_PROPERTIES(
+            paho-mqtt3cs paho-mqtt3as PROPERTIES
+            VERSION ${CLIENT_VERSION}
+            SOVERSION ${PAHO_VERSION_MAJOR}
+            COMPILE_DEFINITIONS "OPENSSL=1")
+        INSTALL(TARGETS paho-mqtt3cs paho-mqtt3as
+            ARCHIVE DESTINATION  ${CMAKE_INSTALL_LIBDIR}
+            LIBRARY DESTINATION  ${CMAKE_INSTALL_LIBDIR}
+            RUNTIME DESTINATION  ${CMAKE_INSTALL_BINDIR})
+    ENDIF()
 
     IF (PAHO_BUILD_STATIC)
         ADD_LIBRARY(paho-mqtt3cs-static STATIC $<TARGET_OBJECTS:common_ssl_obj> MQTTClient.c SSLSocket.c)
